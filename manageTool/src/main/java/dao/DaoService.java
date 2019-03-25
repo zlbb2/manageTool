@@ -35,8 +35,12 @@ public class DaoService {
             e.printStackTrace();
         }
         
-        // test 
-        if (stmt != null) {
+        // test
+        
+	}
+
+	public void close() {
+      if (stmt != null) {
 			try {
 				stmt.close();
 			} catch (SQLException e) {
@@ -44,7 +48,7 @@ public class DaoService {
 				e.printStackTrace();
 			}
 		}
-        if (conn != null) {
+      if (conn != null) {
 			try {
 				conn.close();
 			} catch (SQLException e) {
@@ -52,10 +56,6 @@ public class DaoService {
 				e.printStackTrace();
 			}
 		}
-        
-        
-		
 	}
-	
 	
 }
