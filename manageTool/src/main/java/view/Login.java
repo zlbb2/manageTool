@@ -14,7 +14,7 @@ import java.util.Calendar;
 public class Login {
 
 	public static JFrame frame = new JFrame();
-	private JTextField textField;
+	private JTextField txtA;
 	private JTextField textField_1;
 	String logName = "";
 	String passWord = "";
@@ -54,16 +54,18 @@ public class Login {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setResizable(false);
 		frame.setTitle("\u5DE5\u5177\u7BA1\u7406");
 		frame.setBounds(100, 100, 669, 522);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
 		
-		textField = new JTextField();
-		textField.setBounds(228, 91, 289, 38);
-		frame.getContentPane().add(textField);
-		textField.setColumns(10);
+		txtA = new JTextField();
+		txtA.setText("a");
+		txtA.setBounds(228, 91, 289, 38);
+		frame.getContentPane().add(txtA);
+		txtA.setColumns(10);
 		
 		JLabel lblNewLabel = new JLabel("\u767B\u5F55\u540D\uFF1A");
 		lblNewLabel.setFont(new Font("宋体", Font.BOLD, 16));
@@ -86,7 +88,7 @@ public class Login {
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// click the login then get the name and password then check
-				logName = textField.getText();
+				logName = txtA.getText();
 				passWord = textField_1.getText();
 				if (logName.isEmpty()) {
 					JOptionPane.showMessageDialog(frame, "登录名不能为空", "注意", JOptionPane.WARNING_MESSAGE);
@@ -107,7 +109,7 @@ public class Login {
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// clear
-				textField.setText("");
+				txtA.setText("");
 				textField_1.setText("");
 			}
 		});

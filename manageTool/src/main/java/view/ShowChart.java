@@ -71,6 +71,7 @@ public class ShowChart extends JFrame {
 				
 			}
 		});
+		setResizable(false);
 		setTitle("\u7EDF\u8BA1\u4FE1\u606F");
 		setBounds(100, 100, 893, 545);
 		contentPane = new JPanel();

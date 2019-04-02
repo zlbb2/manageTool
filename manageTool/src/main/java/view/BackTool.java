@@ -93,6 +93,7 @@ public class BackTool extends JFrame {
 				
 			}
 		});
+		this.setResizable(false);
 		setTitle("\u5DE5\u5177\u5F52\u8FD8");
 		setBounds(100, 100, 735, 448);
 		contentPane = new JPanel();

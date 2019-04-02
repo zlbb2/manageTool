@@ -3,18 +3,25 @@ package view;
 import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.border.EmptyBorder;
+
+import dao.ViewService;
+
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import java.awt.Font;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
 
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import java.awt.Color;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class FindTool extends JFrame {
 
@@ -36,10 +43,17 @@ public class FindTool extends JFrame {
 	private JTextField textField_6;
 	private JTextField textField_7;
 	private JTextField textField_8;
+	public JFrame jFrame = null;
 
 	/**
 	 * Launch the application.
 	 */
+	ViewService viewService = null;
+	ArrayList<JTextField> textFieldArray = null;
+	JTextArea txtrA = null;
+	JScrollBar jScrollBar = null;
+	
+	
 	public static void main(String[] args) {
 		FindTool frame = new FindTool();
 		frame.setVisible(true);
@@ -50,6 +64,10 @@ public class FindTool extends JFrame {
 	 * Create the frame.
 	 */
 	public FindTool() {
+		// load service
+		viewService = new ViewService();
+		jFrame = this;
+		jFrame.setResizable(false);
 		// close
 		this.addWindowListener(new WindowListener() {
 			
@@ -76,6 +94,8 @@ public class FindTool extends JFrame {
 			public void windowClosing(WindowEvent e) {
 				// TODO Auto-generated method stub
 				Login.frame.setVisible(true);
+				// every parameter initial
+				closeInitial();
 			}
 			
 			public void windowClosed(WindowEvent e) {
@@ -123,10 +143,10 @@ public class FindTool extends JFrame {
 		contentPane.add(textField_1);
 		textField_1.setColumns(10);
 		
-		JButton btnNewButton = new JButton("\u501F");
-		btnNewButton.setBounds(488, 53, 54, 31);
-		contentPane.add(btnNewButton);
-		
+		JButton button_0 = new JButton("\u501F");
+		button_0.setBounds(488, 53, 54, 31);
+		contentPane.add(button_0);
+
 		JLabel label_8 = new JLabel("\u9875 \u7801\uFF1A");
 		label_8.setBounds(67, 405, 54, 15);
 		contentPane.add(label_8);
@@ -137,15 +157,25 @@ public class FindTool extends JFrame {
 		textField_9.setColumns(10);
 		
 		JButton button_8 = new JButton("\u4E0A\u4E00\u9875");
+		button_8.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				lastPage();
+			}
+		});
 		button_8.setBounds(220, 401, 93, 23);
 		contentPane.add(button_8);
 		
 		JButton button_9 = new JButton("\u4E0B\u4E00\u9875");
+		button_9.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				nextPage();
+			}
+		});
 		button_9.setBounds(367, 401, 93, 23);
 		contentPane.add(button_9);
 		
 		JButton button_10 = new JButton("");
-		button_10.setBounds(552, 0, 15, 463);
+		button_10.setBounds(552, 0, 15, 473);
 		contentPane.add(button_10);
 		
 		JLabel label_9 = new JLabel("\u501F\u7528\u5DE5\u5177\u5217\u8868");
@@ -158,10 +188,12 @@ public class FindTool extends JFrame {
 		scrollPane.setBounds(577, 50, 269, 237);
 		contentPane.add(scrollPane);
 		
-		JTextArea txtrA = new JTextArea();
-		txtrA.setText("1\r\n2\r\n3\r\n4\r\n5\r\n6\r\n7\r\n8\r\n9\r\n0\r\n1\r\n2\r\n3\r\n4\r\n5\r\n6\r\n7\r\n8\r\n9\r\n0\r\n");
+		txtrA = new JTextArea();
+		txtrA.setFont(new Font("宋体", Font.PLAIN, 16));
 		txtrA.setEditable(false);
 		scrollPane.setViewportView(txtrA);
+		jScrollBar=scrollPane.getVerticalScrollBar();
+		
 		
 		JLabel label_10 = new JLabel("\u501F\u7528\u65F6\u95F4\uFF1A");
 		label_10.setBounds(577, 297, 70, 21);
@@ -315,5 +347,108 @@ public class FindTool extends JFrame {
 		label_7.setFont(new Font("宋体", Font.PLAIN, 16));
 		label_7.setBounds(10, 345, 44, 31);
 		contentPane.add(label_7);
-	}
+		
+		// load the component
+		textFieldArray = new ArrayList<JTextField>();
+		textFieldArray.add(textField_1);
+		textFieldArray.add(textField_2);
+		textFieldArray.add(textField_3);
+		textFieldArray.add(textField_4);
+		textFieldArray.add(textField_5);
+		textFieldArray.add(textField_6);
+		textFieldArray.add(textField_7);
+		textFieldArray.add(textField_8);
+		
+		// display the tool info
+		viewService.displayTool(textFieldArray);
+		
+		// display the page number
+		viewService.displayPageNumber(textField_9,1);
+		
+		// add the borrow button action
+		button_0.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				borrowedSelect(0);
+			}
+		});
+		
+		button_1.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				borrowedSelect(1);
+			}
+		});
+
+		button_2.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				borrowedSelect(2);
+			}
+		});
+		
+		button_3.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				borrowedSelect(3);
+			}
+		});
+		
+		button_4.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				borrowedSelect(4);
+			}
+		});
+		
+		button_5.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				borrowedSelect(5);
+			}
+		});
+		
+		button_6.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				borrowedSelect(6);
+			}
+		});
+		
+		button_7.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				borrowedSelect(7);
+			}
+		});
+
+	}		
+		public void borrowedSelect(int i) {
+			viewService.borrowedSelect(i,textFieldArray,jFrame,txtrA,jScrollBar);
+		}
+
+		// last page action
+		public void lastPage() {
+			viewService.lastPage(textFieldArray,textField_9,jFrame);
+		}
+		
+		// next page action
+		public void nextPage() {
+			viewService.nextPage(textFieldArray,textField_9,jFrame);
+		}
+		
+		// close initial
+		public void closeInitial() {
+			viewService.nowPage = 1;
+			viewService.closeInitial();
+		}
+
+
+
+
+
+
+
+
+
 }

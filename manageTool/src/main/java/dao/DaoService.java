@@ -22,13 +22,16 @@ public class DaoService {
 		DaoService daoService = new DaoService();
 		daoService.connect();
 //		daoService.createToolDatabases();
-		daoService.createTable();
-//		Tool tool2 = new Tool();
-//		System.out.println(daoService.insertOneTool(tool2));
-//		ArrayList<String> list = daoService.showAllTool();
-//		for (int i = 0; i < list.size(); i++) {
-//			System.out.println(list.get(i));
-//		}
+//		daoService.createTable();
+		Tool tool2 = new Tool();
+		System.out.println(daoService.insertOneTool(tool2));
+		System.out.println(daoService.insertOneTool(tool2));
+		System.out.println(daoService.insertOneTool(tool2));
+		System.out.println(daoService.insertOneTool(tool2));
+		ArrayList<String> list = daoService.showAllTool();
+		for (int i = 0; i < list.size(); i++) {
+			System.out.println(list.get(i));
+		}
 //		daoService.updateIsBorrowed(1, true);
 //		daoService.updateIsBorrowed(2, true);
 //		daoService.updateIsBorrowed(3, true);
@@ -42,6 +45,9 @@ public class DaoService {
 		
 		daoService.close();
 	}
+	
+	
+	
 
 	// 1. connect
 	public void connect() {
@@ -54,6 +60,7 @@ public class DaoService {
         try {
             conn = src.getConnection();
             stmt = conn.createStatement();
+            
             System.out.println("connect ... ");
         }catch (Exception e){
             e.printStackTrace();
@@ -146,7 +153,7 @@ public class DaoService {
 		return tool.toString();
 	}
 	
-	// 6. select the tool
+	// 6. show all tools
 	public ArrayList<String> showAllTool() {
 		ArrayList<String> allTool = new ArrayList<String>();
 		try {
@@ -221,6 +228,47 @@ public class DaoService {
 			e.printStackTrace();
 		}
 		return row;
+	}
+	
+	// 11. all selected tool set false
+	public void initialSelected() {
+		sql = "update tool_one set t_isSelected=false where t_id>0";
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.executeUpdate();
+		} catch (Exception e) {
+
+		}
+	}
+
+
+
+
+	
+	// 12. get the boolean of is selected
+	public boolean isSelectedById(int id) {
+		sql = "select t_isSelected from tool_one where t_id = ?";
+		boolean r = false;
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, id);
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				System.out.println("the tool is select : " + resultSet.getBoolean("t_isSelected"));
+				r = resultSet.getBoolean("t_isSelected");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return r;
+	}
+
+
+
+	// 13. set the tool is selected
+	public void setToolIsSelected(int id,boolean b) {
+		updateIsSelected(id, b);
 	}
 	
 	
