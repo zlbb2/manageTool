@@ -34,8 +34,8 @@ public class FindTool extends JFrame {
 	private JTextField textField_1;
 	private JTextField textField_9;
 	private JTextField textField_10;
-	private JTextField textField_11;
-	private JTextField textField_12;
+	private JTextField txtA;
+	private JTextField txtD;
 	private JTextField textField_2;
 	private JTextField textField_3;
 	private JTextField textField_4;
@@ -72,39 +72,32 @@ public class FindTool extends JFrame {
 		this.addWindowListener(new WindowListener() {
 			
 			public void windowOpened(WindowEvent e) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			public void windowIconified(WindowEvent e) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			public void windowDeiconified(WindowEvent e) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			public void windowDeactivated(WindowEvent e) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			public void windowClosing(WindowEvent e) {
-				// TODO Auto-generated method stub
 				Login.frame.setVisible(true);
 				// every parameter initial
 				closeInitial();
 			}
 			
 			public void windowClosed(WindowEvent e) {
-				// TODO Auto-generated method stub
 				
 			}
 			
 			public void windowActivated(WindowEvent e) {
-				// TODO Auto-generated method stub
 				
 			}
 		});
@@ -200,6 +193,7 @@ public class FindTool extends JFrame {
 		contentPane.add(label_10);
 		
 		textField_10 = new JTextField();
+		textField_10.setText("2019-02-12");
 		textField_10.setBounds(668, 297, 111, 21);
 		contentPane.add(textField_10);
 		textField_10.setColumns(10);
@@ -214,21 +208,28 @@ public class FindTool extends JFrame {
 		label_12.setBounds(577, 354, 54, 15);
 		contentPane.add(label_12);
 		
-		textField_11 = new JTextField();
-		textField_11.setBounds(668, 351, 111, 21);
-		contentPane.add(textField_11);
-		textField_11.setColumns(10);
+		txtA = new JTextField();
+		txtA.setText("a");
+		txtA.setBounds(668, 351, 111, 21);
+		contentPane.add(txtA);
+		txtA.setColumns(10);
 		
 		JLabel label_13 = new JLabel("\u53D1\u653E\u4EBA\uFF1A");
 		label_13.setBounds(577, 382, 54, 15);
 		contentPane.add(label_13);
 		
-		textField_12 = new JTextField();
-		textField_12.setBounds(668, 379, 111, 21);
-		contentPane.add(textField_12);
-		textField_12.setColumns(10);
+		txtD = new JTextField();
+		txtD.setText("d");
+		txtD.setBounds(668, 379, 111, 21);
+		contentPane.add(txtD);
+		txtD.setColumns(10);
 		
 		JButton button_11 = new JButton("\u786E\u5B9A");
+		button_11.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				confirmBorrow();
+			}
+		});
 		button_11.setBounds(588, 430, 93, 23);
 		contentPane.add(button_11);
 		
@@ -423,6 +424,12 @@ public class FindTool extends JFrame {
 		});
 
 	}		
+		// press confirm
+		protected void confirmBorrow() {
+			viewService.confirmBorrow(txtrA,textField_10,txtA,txtD,jFrame);
+		}
+
+		// press borrow
 		public void borrowedSelect(int i) {
 			viewService.borrowedSelect(i,textFieldArray,jFrame,txtrA,jScrollBar);
 		}

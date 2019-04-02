@@ -74,7 +74,6 @@ public class DaoService {
 				stmt.close();
 				System.out.println("close the database ... ");
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -82,7 +81,6 @@ public class DaoService {
 			try {
 				conn.close();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -241,10 +239,6 @@ public class DaoService {
 		}
 	}
 
-
-
-
-	
 	// 12. get the boolean of is selected
 	public boolean isSelectedById(int id) {
 		sql = "select t_isSelected from tool_one where t_id = ?";
@@ -264,14 +258,167 @@ public class DaoService {
 		return r;
 	}
 
-
-
 	// 13. set the tool is selected
 	public void setToolIsSelected(int id,boolean b) {
 		updateIsSelected(id, b);
 	}
+
+	// 14. get selected tool amount
+	public int getSelectedToolAmount() {
+		sql = "select * from tool_one where t_isSelected=true";
+		int amount = 0;
+		try {
+			resultSet = stmt.executeQuery(sql);
+			while (resultSet.next()) {
+				amount ++;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return amount;
+	}
 	
-	
+	// 15. create the borrow proof table
+	public void createBorrowProofTable() {
+		sql = "create table if not exists `borrow_proof` ("
+				+ "`t_id` int unsigned auto_increment,"
+				+ "`t_time` varchar(127),"
+				+ "`t_givePeople` varchar(127),"
+				+ "`t_borrowPeople` varchar(127),"
+				+ "`t_toolList` varchar(1024),"
+				+ "`t_isBack` boolean,"
+				+ "`t_backTime` varchar(127),"
+				+ "`t_backGivePeople` varchar(127),"
+				+ "`t_backRecivePeople` varchar(127),"
+				+ "`t_note` varchar(1024),"
+				+ "primary key(`t_id`))DEFAULT CHARSET=utf8 COLLATE `utf8_general_ci`";
+		
+		try {
+			stmt = conn.createStatement();
+			boolean reset = stmt.execute(sql);
+			if (reset) {
+				System.out.println("create the borrow proof succeed ...");
+			}else {
+				System.out.println("create table fail ...");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		System.out.println(sql);
+		
+	}
+
+	// 16. get the selected tool id 
+	public ArrayList<Integer> getSelectedToolIdList() {
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		sql = "select t_id from tool_one where t_isSelected=true";
+		try {
+			resultSet = stmt.executeQuery(sql);
+			while (resultSet.next()) {
+				list.add(resultSet.getInt("t_id"));
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
+
+	// 17. save one borrow proof
+	/*
+	 *1 t_id
+	 *2 t_time
+	 *3 t_givePeople
+	 *4 t_borrowPeople
+	 *5 t_toolList
+	 *6 t_isBack boolean
+	 *7 t_backTime
+	 *8 t_backGivePeople
+	 *9 t_backRecivePeople
+	 *10 t_note
+	 */
+	public void setBorrowProof(String timeString, 
+			String borrowPeopleString, 
+			String givePeopleString,
+			ArrayList<Integer> list) {
+		PreparedStatement prest = null;
+		String sql = "insert into borrow_proof values(?,?,?,?,?"
+												+ ",?,?,?,?,?)";
+		
+		String toolList = "";
+		for (int i = 0; i < list.size(); i++) {
+			toolList += list.get(i) + ",";
+		}
+		try {
+			conn = src.getConnection();
+			prest = conn.prepareStatement(sql);
+			prest.setInt(1, 0);
+			prest.setString(2, timeString);
+			prest.setString(3, givePeopleString);
+			prest.setString(4, borrowPeopleString);
+			prest.setString(5, toolList);
+			prest.setBoolean(6, false);
+			prest.setString(7, null);
+			prest.setString(8, null);
+			prest.setString(9, null);
+			prest.setString(10, null);
+			
+			prest.executeUpdate();
+			System.out.println("insert a borrow proof ...");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		if (prest != null) {
+			try {
+				prest.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}		
+		
+	}
+
+	// 18. all tool selected is b
+	public void setAllToolSelected(boolean b) {
+		String sql = "update tool_one set t_isSelected=? where t_id>0";
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setBoolean(1, b);
+			preparedStatement.executeUpdate();	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+
+
+
+	// 19. set the tool of list is borrowed is b
+	public void setToolOfListBorrowed(ArrayList<Integer> list, boolean b) {
+		for (int i = 0; i < list.size(); i++) {
+			updateIsBorrowed(list.get(i), b);
+		}
+	}
+
+	// 20. check whether the tool is borrowed
+	public boolean isBorrowedById(int id) {
+		sql = "select t_isBorrowed from tool_one where t_id = ?";
+		boolean r = false;
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, id);
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				System.out.println("the tool is borrowed : " + resultSet.getBoolean("t_isBorrowed"));
+				r = resultSet.getBoolean("t_isBorrowed");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return r;
+	}
 	
 	
 	
