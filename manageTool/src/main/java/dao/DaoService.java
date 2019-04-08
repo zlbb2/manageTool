@@ -390,10 +390,6 @@ public class DaoService {
 		}
 	}
 
-
-
-
-
 	// 19. set the tool of list is borrowed is b
 	public void setToolOfListBorrowed(ArrayList<Integer> list, boolean b) {
 		for (int i = 0; i < list.size(); i++) {
@@ -419,8 +415,277 @@ public class DaoService {
 		
 		return r;
 	}
+
+	// 21. search tool by user input
+	public ArrayList<String> searchToolByInfo(String toolName) {
+		sql = "select * from `tool_one` where concat(ifnull(`t_name`,''),ifnull(`t_type`,''),ifnull(`t_product`,'')) like ?"; 
+		ArrayList<String> r = new ArrayList<String>();
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			// 设定参数
+			preparedStatement.setString(1, "%" + toolName + "%" );        
+			// 获取查询的结果集      
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				r.add(resultSet.getString("t_id"));
+			}
+			System.out.println("search .............. 3");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return r;
+	}
+
+	// 21. accord the id list get the tool list
+	public ArrayList<String> getToolListByIdList(ArrayList<String> searchResult) {
+		ArrayList<String> toolList = new ArrayList<String>();
+		sql = "select * from tool_one where t_id = ?";
+		String s = "";
+		for (int i = 0; i < searchResult.size(); i++) {
+			try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setString(1, searchResult.get(i));
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				s = "" + resultSet.getString("t_id") + ",";
+				s += resultSet.getString("t_type") + ",";
+				s += resultSet.getString("t_product");
+				System.out.println("search result ...... ");
+				System.out.println(s);
+			}
+				toolList.add(s);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		
+		return toolList;
+	}
+
+
+	// 22. get all the borrow proof to display
+	public ArrayList<String> getAllBorrowProof() {
+		sql = "select * from borrow_proof";
+		ArrayList<String> allBorrowProof = new ArrayList<String>();
+		try {
+			resultSet = stmt.executeQuery(sql);
+			while (resultSet.next()) {
+				String id = resultSet.getString(BorrowProof.T_ID);
+				String time = resultSet.getString(BorrowProof.T_TIME);
+				String borrowPeople = resultSet.getString(BorrowProof.T_BORROW_PEOPLE);
+				String givePeople = resultSet.getString(BorrowProof.T_GIVE_PEOPLE);
+				allBorrowProof.add(id + "," + time + "," + borrowPeople + "," + givePeople);
+			}
+		} catch (Exception e) {
+
+		}
+		
+		return allBorrowProof;
+	}
+
+
+	// 23. get tool id list by borrow proof id
+	public ArrayList<Integer> getToolListByBorrowProofId(int id) {
+		sql = "select t_toolList from borrow_proof where t_id=?";
+		ArrayList<Integer> idList = new ArrayList<Integer>();
+		String r = "";
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, id);
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				r = resultSet.getString("t_toolList");
+//				System.out.println("t - tool list dao service ................ ");
+//				System.out.println(r);
+			}
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+		}
+		
+		if (r.isEmpty()) {
+			System.out.println("无工具");
+		}else {
+			String[] sp = r.split(",");
+			for (int i = 0; i < sp.length; i++) {
+				idList.add(Integer.parseInt(sp[i]));
+			}
+		}
+		
+		
+		
+		return idList;
+	}
+
+
+	// 24. accord the tool id list get the tool name list
+	public ArrayList<String> getToolNameListByIdList(ArrayList<Integer> ids) {
+		ArrayList<String> names = new ArrayList<String>();
+		sql = "select t_name from tool_one where t_id=?";
+		for (int i = 0; i < ids.size(); i++) {
+			try {
+				preparedStatement = conn.prepareStatement(sql);
+				preparedStatement.setInt(1, ids.get(i));
+				resultSet = preparedStatement.executeQuery();
+				while (resultSet.next()) {
+					names.add(resultSet.getString("t_name"));
+					System.out.println("t name tool name list by id list ...................... :  " + resultSet.getString("t_name"));
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return names;
+	}
+
+
+	// 25. get borrow proof give people when borrow tool by id
+	public String getBorrowToolGivePeopleById(int id) {
+		sql = "select t_givePeople from borrow_proof where t_id=?";
+		String r = "";
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, id);
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				r = resultSet.getString("t_givePeople");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return r;
+	}
 	
-	
+	// 26. get borrow proof borrow people when borrow tool by id
+	public String getBorrowToolBorrowPeopleById(int id) {
+		sql = "select t_borrowPeople from borrow_proof where t_id=?";
+		String r = "";
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, id);
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				r = resultSet.getString("t_borrowPeople");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return r;
+	}
+
+
+	// 27. get borrow time by id borrow proof
+	public String getBorrowToolBorrowTimeById(int id) {
+		sql = "select t_time from borrow_proof where t_id=?";
+		String r = "";
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, id);
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				r = resultSet.getString("t_time");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return r;
+	}
+
+
+
+	// 28. set borrow proof back by id
+	public void setBorrowProofBackByToolId(int id,boolean state) {
+		sql = "update tool_one set t_isBorrowed=? where t_id=?";
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setBoolean(1, state);
+			preparedStatement.setInt(2, id);
+			preparedStatement.executeUpdate();	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+
+
+	// 29. set back tool info in the borrow proof table
+	public void setBorrowProofBackInfo(String backTime, String backGivePeople, String backGetPeople, int id) {
+		sql = "update borrow_proof set t_isBack=?,t_backTime=?,t_backGivePeople=?,t_backRecivePeople=? where t_id=?";
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setBoolean(1, true);
+			preparedStatement.setString(2, backTime);
+			preparedStatement.setString(3, backGivePeople);
+			preparedStatement.setString(4, backGetPeople);
+			preparedStatement.setInt(5, id);
+			preparedStatement.executeUpdate();	
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+
+	// 30. get the state of borrow proof is back 
+	public boolean isBorrowProofBack(int borrowProofId) {
+		sql = "select t_isBack from borrow_proof where t_id=?";
+		boolean r = false;
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, borrowProofId);
+			preparedStatement.executeQuery();
+			resultSet = preparedStatement.getResultSet();
+			while (resultSet.next()) {
+				r = resultSet.getBoolean("t_isBack");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return r;
+	}
+
+
+
+	// 31. get borrow proof is back state
+	public boolean getBorrowProofIsBackStateById(int id) {
+		boolean r = false;
+		sql = "select t_isBack from borrow_proof where t_id=?";
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, id);
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				r = resultSet.getBoolean("t_isBack");
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return r;
+	}
+
+
+
+	// 32. get the borrow proof time people info
+	public String getBorrowProofMoreInfoWhenIsBack(int id) {
+		String r = "";
+		sql = "select * from borrow_proof where t_id=?";
+		try {
+			preparedStatement = conn.prepareStatement(sql);
+			preparedStatement.setInt(1, id);
+			resultSet = preparedStatement.executeQuery();
+			while (resultSet.next()) {
+				r += "归还时间： " + resultSet.getString("t_backTime") + "\n";
+				r += "归还人： " + resultSet.getString("t_backGivePeople") + "\n";
+				r += "接收人： " + resultSet.getString("t_backRecivePeople") + "\n";
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return r;
+	}
 	
 	
 	

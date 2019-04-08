@@ -6,6 +6,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.border.EmptyBorder;
 
+import com.mysql.cj.util.TestUtils;
+
 import dao.ViewService;
 
 import javax.swing.JLabel;
@@ -13,7 +15,9 @@ import javax.swing.SwingConstants;
 import java.awt.Font;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.swing.JTextField;
 import javax.swing.JButton;
@@ -21,7 +25,10 @@ import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import java.awt.Color;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
 
 public class FindTool extends JFrame {
 
@@ -121,6 +128,11 @@ public class FindTool extends JFrame {
 		textField.setColumns(10);
 		
 		JButton button = new JButton("\u641C  \u7D22");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				search();
+			}
+		});
 		button.setBounds(367, 11, 93, 27);
 		contentPane.add(button);
 		
@@ -197,6 +209,33 @@ public class FindTool extends JFrame {
 		textField_10.setBounds(668, 297, 111, 21);
 		contentPane.add(textField_10);
 		textField_10.setColumns(10);
+		textField_10.addMouseListener(new MouseListener() {
+			
+			public void mouseReleased(MouseEvent e) {
+				
+			}
+			
+			public void mousePressed(MouseEvent e) {
+				
+			}
+			
+			public void mouseExited(MouseEvent e) {
+				
+			}
+			
+			public void mouseEntered(MouseEvent e) {
+				
+			}
+			
+			public void mouseClicked(MouseEvent e) {
+				int clickTimes = e.getClickCount();
+			    if (clickTimes == 2) {
+			    	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+					System.out.println(df.format(new Date()));
+					textField_10.setText(df.format(new Date()));
+			    }				
+			}
+		});
 		
 		JLabel label_11 = new JLabel("\u65F6\u95F4\u683C\u5F0F\uFF1A2019-01-01");
 		label_11.setForeground(Color.RED);
@@ -209,6 +248,15 @@ public class FindTool extends JFrame {
 		contentPane.add(label_12);
 		
 		txtA = new JTextField();
+		txtA.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int clickTimes = e.getClickCount();
+			    if (clickTimes == 2) {
+			    	txtA.setText(ViewService.ADMIN);
+			    }
+			}
+		});
 		txtA.setText("a");
 		txtA.setBounds(668, 351, 111, 21);
 		contentPane.add(txtA);
@@ -219,6 +267,15 @@ public class FindTool extends JFrame {
 		contentPane.add(label_13);
 		
 		txtD = new JTextField();
+		txtD.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				int clickTimes = e.getClickCount();
+			    if (clickTimes == 2) {
+			    	txtD.setText(ViewService.BORROWER);
+			    }
+			}
+		});
 		txtD.setText("d");
 		txtD.setBounds(668, 379, 111, 21);
 		contentPane.add(txtD);
@@ -236,6 +293,12 @@ public class FindTool extends JFrame {
 		JButton button_12 = new JButton("\u91CD\u7F6E");
 		button_12.setBounds(711, 430, 93, 23);
 		contentPane.add(button_12);
+		button_12.addActionListener(new ActionListener() {
+			
+			public void actionPerformed(ActionEvent e) {
+				clearSelect();	
+			}
+		});
 		
 		JButton button_1 = new JButton("\u501F");
 		button_1.setBounds(488, 94, 54, 31);
@@ -366,6 +429,13 @@ public class FindTool extends JFrame {
 		// display the page number
 		viewService.displayPageNumber(textField_9,1);
 		
+		JLabel lblNewLabel_1 = new JLabel("红色代表工具已经借出");
+		lblNewLabel_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_1.setForeground(Color.RED);
+		lblNewLabel_1.setFont(new Font("宋体", Font.BOLD, 15));
+		lblNewLabel_1.setBounds(54, 438, 424, 35);
+		contentPane.add(lblNewLabel_1);
+		
 		// add the borrow button action
 		button_0.addActionListener(new ActionListener() {
 			
@@ -424,9 +494,21 @@ public class FindTool extends JFrame {
 		});
 
 	}		
+	
+		// search tool
+		protected void search() {
+			System.out.println("search .............. 1 ");
+			viewService.search(textField,jFrame,textFieldArray,textField_9);
+		}
+
+		// press clear
+		protected void clearSelect() {
+			viewService.clearSelect(txtrA,textField_10,txtA,txtD,jFrame, textFieldArray);
+		}
+
 		// press confirm
 		protected void confirmBorrow() {
-			viewService.confirmBorrow(txtrA,textField_10,txtA,txtD,jFrame);
+			viewService.confirmBorrow(txtrA,textField_10,txtA,txtD,jFrame,textFieldArray);
 		}
 
 		// press borrow
@@ -449,13 +531,4 @@ public class FindTool extends JFrame {
 			viewService.nowPage = 1;
 			viewService.closeInitial();
 		}
-
-
-
-
-
-
-
-
-
 }

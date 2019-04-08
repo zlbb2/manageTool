@@ -1,10 +1,12 @@
 package dao;
 
+import java.awt.Color;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -21,33 +23,71 @@ public class ViewService {
 	ArrayList<String> allTool = new ArrayList<String>();
 	// borrowing car
 	public String borrowingCar = "";
+	// default administrator
+	public static final String ADMIN = "管理员";
+	// default borrowed
+	public static final String BORROWER = "工具领用人";
+	// all borrow proof
+	ArrayList<String> allBorrowProof = new ArrayList<String>();
+	// borrow proof total page
+	public int borrowProofTotalPage = 1;
+	public int borrowProofNowPage = 1;
 	
 	public ViewService () {
 		daoService = new DaoService();
 		daoService.connect();
+		// tool one
 		allTool = daoService.showAllTool();
 		totalPage = allTool.size() / 8 + 1;
 		totalTool = allTool.size();
+		// borrow proof
+		allBorrowProof = daoService.getAllBorrowProof();
+		borrowProofTotalPage = allBorrowProof.size() / 8 + 1;
+		
 		System.out.println("load view service , tool amount : " + allTool.size());
 	}
 
 	// 1. display tool initial time
 	public void displayTool(ArrayList<JTextField> textFieldArray) {
 		
-		// give the user color tips
-		// TODO
+		// 1. clean the display
+		for (int i = 0; i < textFieldArray.size(); i++) {
+			textFieldArray.get(i).setText("");
+			textFieldArray.get(i).setBackground(Color.WHITE);
+		}
 		if (allTool.size() > 8) {
 			for (int j = 0; j < 8; j++) {
 				textFieldArray.get(j).setText(allTool.get(j));
+				colorTips(textFieldArray.get(j));
 			}
 		}else {
 			for (int i = 0; i < allTool.size(); i++) {
 				textFieldArray.get(i).setText(allTool.get(i));
+				colorTips(textFieldArray.get(i));
 			}
 		}
 	}
 
-	
+	// 1-2. display borrow proof initial time
+	public void displayBorrowProof(ArrayList<JTextField> textFieldArray) {
+		// 1. clean the display
+				for (int i = 0; i < textFieldArray.size(); i++) {
+					textFieldArray.get(i).setText("");
+					textFieldArray.get(i).setBackground(Color.WHITE);
+				}
+				if (allBorrowProof.size() > 8) {
+					for (int j = 0; j < 8; j++) {
+						textFieldArray.get(j).setText(allBorrowProof.get(j));
+						textFieldArray.get(j).setBackground(Color.WHITE);
+					}
+				}else {
+					for (int i = 0; i < allBorrowProof.size(); i++) {
+						textFieldArray.get(i).setText(allBorrowProof.get(i));
+						textFieldArray.get(i).setBackground(Color.WHITE);
+					}
+				}
+	}
+
 	// 2. display page number
 	public void displayPageNumber(JTextField textField_9,int nowPage) {
 		totalTool = allTool.size();
@@ -55,10 +95,16 @@ public class ViewService {
 		textField_9.setText(nowPage + " / " + totalPage);
 	}
 
+	// 2-2. borrow proof display page number
+	public void borrowProofDisplayPageNumber(JTextField pageNumber,int nowPage) {
+		borrowProofTotalPage = allBorrowProof.size() / 8 + 1;
+		pageNumber.setText(nowPage + " / " + borrowProofTotalPage);
+	}
 	
 	// 3. last page
 	public void lastPage(ArrayList<JTextField> textFieldArray, JTextField textField_9, JFrame jFrame) {
 		// TODO color tips
+		clearColor(textFieldArray);
 		if (nowPage <=1 ) {
 			// now is the last page
 			JOptionPane.showMessageDialog(jFrame, "这是第一页");
@@ -77,8 +123,10 @@ public class ViewService {
 					}else {
 						if (nowPage == 2) {
 							textFieldArray.get(i).setText(allTool.get(8 + i));
+							colorTips(textFieldArray.get(i));
 						}else {
 							textFieldArray.get(i).setText(allTool.get((nowPage -1) * 8 + i - 1));
+							colorTips(textFieldArray.get(i));
 						}
 					}
 				}else {
@@ -92,6 +140,7 @@ public class ViewService {
 	// 4. next page
 	public void nextPage(ArrayList<JTextField> textFieldArray, JTextField textField_9, JFrame jFrame) {
 		// TODO color tips
+		clearColor(textFieldArray);
 		if (nowPage >= totalPage) {
 			JOptionPane.showMessageDialog(jFrame, "这是最后一页");
 		}else {
@@ -108,8 +157,10 @@ public class ViewService {
 					}else {
 						if (nowPage == 2) {
 							textFieldArray.get(i).setText(allTool.get(8 + i));
+							colorTips(textFieldArray.get(i));
 						}else {
 							textFieldArray.get(i).setText(allTool.get((nowPage -1) * 8 + i - 1));
+							colorTips(textFieldArray.get(i));
 						}
 					}
 				}else {
@@ -119,7 +170,6 @@ public class ViewService {
 		}
 		System.out.println("now page: " + nowPage);
 	}
-
 
 	// 5. close initial
 	public void closeInitial() {
@@ -132,7 +182,7 @@ public class ViewService {
 		// 1. check the position whether text field is empty
 		String toolInfo = textFieldArray.get(i).getText();
 		
-		if (toolInfo.equals("\\")) {
+		if (toolInfo.equals("\\") || toolInfo.trim().isEmpty()) {
 			System.out.println("the select tool is empty ... ");
 			JOptionPane.showMessageDialog(jFrame, "你选择的工具栏为空");
 		}else {
@@ -177,10 +227,9 @@ public class ViewService {
 		
 	}
 
-
 	// 7. confirm borrow 
 	public void confirmBorrow(JTextArea toolList, JTextField time, JTextField borrowPeople,
-			JTextField givePeople, JFrame jFrame) {
+			JTextField givePeople, JFrame jFrame,ArrayList<JTextField> displayTextArray) {
 		// 1. check whether the info is complete
 		boolean complete = true;
 		if (time.getText().isEmpty()) {
@@ -251,11 +300,19 @@ public class ViewService {
 				// 9. give the user a message of succeed
 				int r = JOptionPane.showConfirmDialog(jFrame, "工具借用成功，已生成借用记录，是否跳转查看");
 				if (r == JOptionPane.YES_OPTION) {
+					// 11. give the user color tip of what tool is borrowed
+					for (int i = 0; i < 8; i++) {
+						colorTips(displayTextArray.get(i));
+					}
 					// 10. jump to borrow proof frame
 					// TODO
+					
 				}else {
 					// 11. give the user color tip of what tool is borrowed
-					// TODO
+					for (int i = 0; i < 8; i++) {
+						colorTips(displayTextArray.get(i));
+					}
+					
 				}
 				
 			}
@@ -263,9 +320,259 @@ public class ViewService {
 		
 	}
 	
+	// 8. color tips
+	public void colorTips(JTextField jtField) {
+		jtField.setBackground(Color.WHITE);
+		if (!jtField.getText().trim().isEmpty()) {
+			// 1. get the content
+			String con = jtField.getText();
+			System.out.println("content : " + con );
+			// 2. get tool id
+			String[] ids = con.split(",");
+			System.out.println("ids 0 is ..... : " + ids[0]);
+			int toolId = Integer.parseInt(ids[0]);
+			// 3. check whether borrowed
+			boolean f = daoService.isBorrowedById(toolId);
+			// 4. change color
+			if (f) {
+				jtField.setBackground(Color.RED);
+			}else {
+				jtField.setBackground(Color.WHITE);
+			}
+		}else {
+			jtField.setBackground(Color.WHITE);
+		}
+		
+	}
 
+	// 9. clear the select
+	public void clearSelect(JTextArea toolList, JTextField time, JTextField borrowPeople,
+		JTextField givePeople, JFrame jFrame,ArrayList<JTextField> displayTextArray) {
+		toolList.setText("");
+		SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+		System.out.println(df.format(new Date()));
+		time.setText(df.format(new Date()));
+		borrowPeople.setText("");
+		givePeople.setText("");
+		daoService.setAllToolSelected(false);
+		
+	}
+
+	// 10. search tool
+	public void search(JTextField searchTool, JFrame jFrame, ArrayList<JTextField> displayArray,
+			JTextField page) {
+		// 1. get search info
+		String toolName = searchTool.getText().trim();
+		if (toolName.isEmpty()) {
+			JOptionPane.showMessageDialog(jFrame, "请输入搜索信息");
+			allTool = daoService.showAllTool();
+			updatePage(allTool,page);
+			displayTool(displayArray);
+		}else {
+			// 2. search in the databases
+			System.out.println("search .............. 2");
+			ArrayList<String> searchResult = daoService.searchToolByInfo(toolName);
+			for (int i = 0; i < searchResult.size(); i++) {
+				System.out.println("search .............. ");
+				System.out.println(searchResult.get(i));
+			}
+			// 3. get tool info list
+			ArrayList<String> toolList = daoService.getToolListByIdList(searchResult);
+			// 4. give the result to display
+			allTool.clear();
+			allTool = toolList;
+			System.out.println("tool list size ................... : " + toolList.size());
+			updatePage(allTool,page);
+			displayTool(displayArray);
+		}
+	}
+
+	// 11. update page
+	private void updatePage(ArrayList<String> allTool2,JTextField page) {
+		totalPage = allTool2.size() / 8 + 1;
+		nowPage = 1;
+		page.setText(nowPage + " / " + totalPage);
+		System.out.println("total page ............................ : " + totalPage);
+	}
 	
+	// 12. clear color
+	public void clearColor(ArrayList<JTextField> list) {
+		for (int i = 0; i < list.size(); i++) {
+			list.get(i).setBackground(Color.WHITE);
+		}
+	}
+	
+	// 13. display borrow proof initial time
+	public void displayBorrowProof(ArrayList<JTextField> display,JTextField pageDisplay) {
+		// 1. clean display
+		for (int i = 0; i < display.size(); i++) {
+			display.get(i).setText("");
+			display.get(i).setBackground(Color.WHITE);
+		}
+		if (allBorrowProof.size() > 8) {
+			for (int j = 0; j < 8; j++) {
+				display.get(j).setText(allBorrowProof.get(j));
+				display.get(j).setBackground(Color.WHITE);
+			}
+		}else {
+			for (int i = 0; i < allBorrowProof.size(); i++) {
+				display.get(i).setText(allBorrowProof.get(i));
+				display.get(i).setBackground(Color.WHITE);
+			}
+		}
+		// 2. page display
+		pageDisplay.setText(borrowProofNowPage + " / " + borrowProofTotalPage);
+		// color tips
+		for (int i = 0; i < display.size(); i++) {
+			colorBorrowProoTips(display.get(i));
+		}
+	}
+	
+	// 14. borrow proof last page
+	public void borrowProofLastPage(ArrayList<JTextField> display, JTextField pageDisplay, JFrame jFrame) {
+		// clear
+		clearColor(display);
+		if (borrowProofNowPage <= 1) {
+			JOptionPane.showMessageDialog(jFrame, "这是第一页了");
+			displayBorrowProof(display, pageDisplay);
+		}else {
+			borrowProofNowPage --;
+			if (borrowProofNowPage <= 1) {
+				borrowProofNowPage = 1;
+			}
+			borrowProofDisplayPageNumber(pageDisplay, borrowProofNowPage);
+			// accord the page number display borrow proof 
+			displayContent(borrowProofNowPage, allBorrowProof, display);
+			// color tips
+			for (int i = 0; i < display.size(); i++) {
+				colorBorrowProoTips(display.get(i));
+			}
+			
+		}
+	}
+	
+	// 15. accord the page number display the data
+	public void displayContent(int nowPage,ArrayList<String> content,ArrayList<JTextField> displays) {
+		for (int i = 0; i < 8; i++) {
+			if (((nowPage - 1) * 8 + i) < content.size() + 1) {
+				if (nowPage <= 1) {
+					displayBorrowProof(displays);
+				}else {
+					if (nowPage == 2) {
+						if (8 + i < content.size()) {
+							displays.get(i).setText(content.get(8 + i));
+							
+						}
 
+					}else {
+						displays.get(i).setText(content.get((nowPage -1) * 8 + i - 1));
+						
+					}
+				}
+			}else {
+				displays.get(i).setText("\\");
+			}
+		}
+	}
+	
+	// 16. borrow proof next page
+	public void borrowProofNextPage(ArrayList<JTextField> display, JTextField pageDisplay, JFrame jFrame) {
+		// clear
+		clearColor(display);
+		if (borrowProofNowPage >= borrowProofTotalPage) {
+			JOptionPane.showMessageDialog(jFrame, "这是最后一页");
+			displayBorrowProof(display, pageDisplay);
+		}else {
+			borrowProofNowPage ++;
+			if (borrowProofNowPage >= borrowProofTotalPage) {
+				borrowProofNowPage = borrowProofTotalPage;
+			}
+			borrowProofDisplayPageNumber(pageDisplay, borrowProofNowPage);
+			// accord the page number display borrow proof 
+			displayContent(borrowProofNowPage, allBorrowProof, display);
+			// color tips
+			for (int i = 0; i < display.size(); i++) {
+				colorBorrowProoTips(display.get(i));
+			}
+		}
+	}
+
+	// 17. get borrow info by id
+	public String getBorrowToolAndPeopleInfoById(int id) {
+		String r = "";
+		r += id + "\n";
+		ArrayList<Integer> ids = daoService.getToolListByBorrowProofId(id);
+		ArrayList<String> toolNameList = daoService.getToolNameListByIdList(ids);
+		for (int i = 0; i < ids.size(); i++) {
+			r += ids.get(i) + "," + toolNameList.get(i) + "\n";
+		}
+		String givePeople = daoService.getBorrowToolGivePeopleById(id);
+		String borrowPeople = daoService.getBorrowToolBorrowPeopleById(id);
+		r += "领用人：" + borrowPeople + "\n";
+		r += "发放人：" + givePeople + "\n";
+		String borrowTime = daoService.getBorrowToolBorrowTimeById(id);
+		r += "借用时间：" + borrowTime + "\n";
+		return r;
+	}
+
+	// 18. accord the borrow proof id back the tool , set is_borrowed false
+	public void setBorrowProofBackById(int id) {
+		ArrayList<Integer> ids = new ArrayList<Integer>();
+		ids = daoService.getToolListByBorrowProofId(id);
+		for (int i = 0; i < ids.size(); i++) {
+			// t_isBorrowed : false
+			daoService.setBorrowProofBackByToolId(ids.get(i), false);	
+		}
+	}
+
+	// 19. back tool set the info
+	public void setBorrowProofBackInfo(String backTime, String backGivePeople, String backGetPeople,int id) {
+		daoService.setBorrowProofBackInfo(backTime,backGivePeople,backGetPeople,id);
+	} 
+	
+	// 20. color tips
+	public void colorBorrowProoTips(JTextField jtField) {
+		jtField.setBackground(Color.WHITE);
+		if (!jtField.getText().trim().isEmpty() && !jtField.getText().trim().equals("\\")) {
+			// 1. get the content
+			String con = jtField.getText();
+			System.out.println("content : " + con );
+			// 2. get tool id
+			String[] ids = con.split(",");
+			int borrowProofId = Integer.parseInt(ids[0]);
+			// 3. check whether borrowed
+//			boolean f = daoService.isBorrowedById(toolId);
+			boolean f = daoService.isBorrowProofBack(borrowProofId);
+			// 4. change color
+			if (f) {
+				jtField.setBackground(Color.GREEN);
+			}else {
+				jtField.setBackground(Color.WHITE);
+			}
+		}else {
+			jtField.setBackground(Color.WHITE);
+		}
+		
+	}
+
+	// 21. get the is back state of borrow proof by id
+	public boolean getBorrowProofIsBackStateById(int id) {
+		boolean r = daoService.getBorrowProofIsBackStateById(id);
+		
+		return r;
+	}
+
+	// 22. get more info when borrow proof is back
+	public String getBorrowProofMoreInfoWhenIsBack(int id) {
+		return daoService.getBorrowProofMoreInfoWhenIsBack(id);
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 	
 }
